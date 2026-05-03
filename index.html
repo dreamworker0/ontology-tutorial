@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 온톨로지 튜토리얼</title>
+    <!-- vis-network CDN을 jsdelivr 최신 안정 버전으로 변경 -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            margin: 0; padding: 0;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 상단 네비게이션/헤더 */
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        
+        .progress-container { display: flex; gap: 8px; }
+        .step-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background-color: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background-color: #fbbf24; transform: scale(1.3); box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+
+        /* 메인 레이아웃 (좌우 2단 분할) */
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 왼쪽 패널: 설명 및 제어부 */
+        .sidebar {
+            width: 400px;
+            background: white;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03);
+            z-index: 5;
+            overflow-y: auto;
+        }
+        .step-badge {
+            display: inline-block;
+            background-color: #ebf4ff; color: #3182ce;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 14px; font-weight: 700; margin-bottom: 15px;
+        }
+        #step-title { margin: 0 0 20px 0; font-size: 28px; font-weight: 800; color: #1a202c; line-height: 1.3; }
+        #step-desc { flex: 1; font-size: 16px; line-height: 1.6; color: #4a5568; }
+        
+        .concept-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #3182ce;
+            padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+
+        /* 액션 컨트롤러 영역 */
+        #action-container { margin-top: 20px; min-height: 60px; }
+        
+        .action-btn {
+            background-color: #48bb78; color: white;
+            border: none; padding: 12px 20px; border-radius: 8px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            width: 100%; box-shadow: 0 4px 6px rgba(72,187,120,0.3);
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background-color: #38a169; transform: translateY(-2px); }
+        .action-btn:active { transform: translateY(0); }
+        .action-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* 하단 이전/다음 버튼 영역 */
+        .nav-controls {
+            display: flex; justify-content: space-between;
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;
+        }
+        .nav-btn {
+            background-color: white; border: 1px solid #cbd5e0;
+            padding: 10px 16px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; color: #4a5568; transition: all 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) { background-color: #edf2f7; color: #2d3748; }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav-btn.primary { background-color: #3182ce; color: white; border: none; }
+        .nav-btn.primary:hover:not(:disabled) { background-color: #2b6cb0; }
+
+        /* 오른쪽 패널: 지식 그래프 네트워크 */
+        .main-content {
+            flex: 1;
+            position: relative;
+            background-color: #f0f4f8;
+            padding: 20px;
+            display: flex; flex-direction: column;
+        }
+        #network {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 로그/피드백 창 */
+        #log-panel {
+            position: absolute; bottom: 30px; left: 30px; right: 30px;
+            background: rgba(45, 55, 72, 0.95); color: #68d391;
+            padding: 15px 20px; border-radius: 8px; font-family: monospace; font-size: 14px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease; opacity: 0; pointer-events: none; transform: translateY(20px);
+        }
+        #log-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        
+        .highlight-text { font-weight: bold; color: #ecc94b; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌐 인터랙티브 온톨로지 마스터 클래스</h1>
+    <div class="progress-container" id="progress-dots">
+        <!-- JS에서 동적으로 생성됨 -->
+    </div>
+</header>
+
+<div class="layout">
+    <!-- 왼쪽 패널 -->
+    <div class="sidebar">
+        <div>
+            <span class="step-badge" id="step-badge">Step 1 / 4</span>
+            <h2 id="step-title">트리플(Triple)의 이해</h2>
+            <div id="step-desc">
+                <!-- 설명이 여기에 들어갑니다 -->
+            </div>
+            
+            <div id="action-container">
+                <!-- 단계별 특수 버튼이 들어갑니다 -->
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <button id="btn-prev" class="nav-btn" disabled>← 이전 단계</button>
+            <button id="btn-next" class="nav-btn primary">다음 단계 →</button>
+        </div>
+    </div>
+
+    <!-- 오른쪽 패널 -->
+    <div class="main-content">
+        <div id="network"></div>
+        <div id="log-panel">로그창 대기중...</div>
+    </div>
+</div>
+
+<script>
+    // 전역 네트워크 객체 및 데이터셋
+    let network = null;
+    let nodes = new vis.DataSet([]);
+    let edges = new vis.DataSet([]);
+    
+    let currentStepIndex = 0;
+
+    // 공통 네트워크 옵션 (안전한 기본 폰트 사용)
+    const defaultOptions = {
+        nodes: { shape: 'dot', size: 20, font: { size: 16, face: 'sans-serif' }, borderWidth: 2, shadow: true },
+        edges: { 
+            width: 2, shadow: true, 
+            font: { align: 'middle', size: 14, background: 'rgba(255,255,255,0.8)', face: 'sans-serif' },
+            smooth: { enabled: true, type: 'dynamic' }
+        },
+        physics: { enabled: true, solver: 'forceAtlas2Based' },
+        interaction: { hover: true }
+    };
+
+    // 로그 창 제어
+    function showLog(message) {
+        const logPanel = document.getElementById('log-panel');
+        logPanel.innerHTML = `> ${message}`;
+        logPanel.classList.add('visible');
+    }
+    function hideLog() {
+        document.getElementById('log-panel').classList.remove('visible');
+    }
+
+    // 단계별 데이터 정의
+    const stepsData = [
+        {
+            title: "트리플(Triple)의 이해",
+            desc: `
+                <p>온톨로지의 세계에 오신 것을 환영합니다! 🎉</p>
+                <p>온톨로지의 가장 기본적인 단위는 주어, 동사, 목적어로 이루어진 <strong>트리플(Triple)</strong>입니다.</p>
+                <div class="concept-box">
+                    <strong>"스티브 잡스(주어)는 애플(목적어)을 창립했다(동사)"</strong><br><br>
+                    또한, 이 트리플들이 꼬리를 물고 연결되면 더 큰 지식이 됩니다.<br>
+                    "애플은 <strong>아이폰</strong>을 만들고", "아이폰은 <strong>스마트폰</strong>의 일종이다" 처럼요.
+                </div>
+                <p>오른쪽 그래프를 보세요. 단어(노드)와 관계(화살표)가 연결되면서 하나의 지식 그물망이 만들어진 것을 확인할 수 있습니다.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 1, label: '스티브 잡스', color: { background: '#ffcccb', border: '#e53935' } },
+                    { id: 2, label: '애플', color: { background: '#c8e6c9', border: '#43a047' } },
+                    { id: 3, label: '아이폰', color: { background: '#bbdefb', border: '#1e88e5' } },
+                    { id: 4, label: '스마트폰', color: { background: '#e1bee7', border: '#8e24aa' } }
+                ];
+                const e = [
+                    { from: 1, to: 2, label: '창립했다 (founded)', arrows: 'to' },
+                    { from: 2, to: 3, label: '만들다 (creates)', arrows: 'to' },
+                    { from: 3, to: 4, label: '일종이다 (is a type of)', arrows: 'to' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `` // 특수 액션 없음
+        },
+        {
+            title: "추론 (Inference)",
+            desc: `
+                <p>온톨로지가 일반 데이터베이스보다 뛰어난 점은 바로 <strong>'추론'</strong>입니다.</p>
+                <p>아래 그래프에는 우리가 입력한 <strong>'아빠이다(검은 실선)'</strong> 관계만 존재합니다.</p>
+                <div class="concept-box">
+                    하지만 컴퓨터에게 <strong>"아빠의 아빠는 할아버지다"</strong>라는 규칙을 알려주면 어떨까요?
+                </div>
+                <p>아래 버튼을 눌러 인공지능이 숨겨진 관계를 스스로 찾아내는 것을 확인해 보세요!</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'c', label: '철수 (1세대)', shape: 'box', color: '#ffcccb' },
+                    { id: 'm', label: '민수 (2세대)', shape: 'box', color: '#c8e6c9' },
+                    { id: 'y', label: '영희 (2세대)', shape: 'box', color: '#c8e6c9' },
+                    { id: 'h', label: '지훈 (3세대)', shape: 'box', color: '#bbdefb' },
+                    { id: 's', label: '지수 (3세대)', shape: 'box', color: '#bbdefb' }
+                ];
+                const e = [
+                    { from: 'c', to: 'm', label: '아빠이다', arrows: 'to', color: '#333' },
+                    { from: 'c', to: 'y', label: '아빠이다', arrows: 'to', color: '#333' },
+                    { from: 'm', to: 'h', label: '아빠이다', arrows: 'to', color: '#333' },
+                    { from: 'm', to: 's', label: '아빠이다', arrows: 'to', color: '#333' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn">🚀 인공지능 추론 시작하기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "추론 완료!";
+                
+                // 할아버지 규칙: c -> m -> h,s
+                edges.add([
+                    { from: 'c', to: 'h', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { from: 'c', to: 's', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { from: 'm', to: 'y', label: '형제자매이다', arrows: 'to,from', color: '#8e24aa', dashes: true, font:{color:'#8e24aa'} },
+                    { from: 'h', to: 's', label: '형제자매이다', arrows: 'to,from', color: '#8e24aa', dashes: true, font:{color:'#8e24aa'} }
+                ]);
+                showLog("추론 완료: <span class='highlight-text'>할아버지 관계 2건, 형제 관계 2건</span>을 새롭게 발견했습니다!");
+            }
+        },
+        {
+            title: "지식에 질문 던지기 (SPARQL)",
+            desc: `
+                <p>이제 복잡해진 지식 그래프에서 원하는 데이터만 뽑아내야 합니다.</p>
+                <p>온톨로지에서는 <strong>SPARQL(스파클)</strong>이라는 쿼리 언어로 데이터베이스에 질문을 던집니다.</p>
+                <div class="concept-box">
+                    "모든 사람 중에서, '할아버지'라는 관계를 가진 사람의 '손자/손녀'들만 찾아줘!"
+                </div>
+                <p>아래 버튼을 눌러 컴퓨터가 쿼리에 맞는 대상을 찾아 <strong>노란색</strong>으로 강조하는 걸 확인해 보세요.</p>
+            `,
+            initData: () => {
+                // 2단계에서 추론이 끝난 상태를 초기 상태로 가정
+                const { n, e } = stepsData[1].initData();
+                const inferredEdges = [
+                    { id: 'e_h1', from: 'c', to: 'h', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { id: 'e_h2', from: 'c', to: 's', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} }
+                ];
+                return { n, e: e.concat(inferredEdges) };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #d69e2e;">🔍 3세대(손주)만 검색하기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "검색 완료!";
+                // SPARQL의 결과를 시뮬레이션: 할아버지 관계를 받는(to) 노드만 강조
+                const allEdges = edges.get();
+                const targets = allEdges.filter(e => e.label === '할아버지이다').map(e => e.to);
+                
+                targets.forEach(id => {
+                    nodes.update({ 
+                        id: id, 
+                        color: { background: '#ecc94b', border: '#b7791f' },
+                        shadow: { color: '#ecc94b', size: 20 },
+                        size: 30, // 크기 키우기 (shape: box일때는 폰트 조정으로 크기를 키움)
+                        font: { size: 22, color: 'white' }
+                    });
+                });
+                network.fit({ nodes: targets, animation: true }); // 타겟으로 카메라 줌
+                showLog(`SPARQL 쿼리 결과: 철수의 손주인 <span class='highlight-text'>지훈, 지수</span> 노드를 찾았습니다.`);
+            }
+        },
+        {
+            title: "계층 구조 (Taxonomy)",
+            desc: `
+                <p>온톨로지의 또 다른 핵심은 <strong>분류와 상속(Class & SubClass)</strong>입니다.</p>
+                <p>컴퓨터에게 <strong>"모든 스포츠카는 자동차다"</strong>라고 알려주면, 개별 스포츠카 모델이 자동차라는 것을 일일이 입력하지 않아도 자동으로 알게 됩니다.</p>
+                <div class="concept-box">
+                    포르쉐 911 -> (is a) -> 스포츠카 -> (is a) -> 자동차 -> (is a) -> 탈것
+                </div>
+                <p>아래 버튼을 누르면 <strong>"포르쉐 911은 탈것인가?"</strong>라는 질문에 대해 컴퓨터가 계층을 타고 올라가며 검증합니다.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'vehicle', label: '탈것 (Vehicle)', group: 'top', level: 0 },
+                    { id: 'car', label: '자동차 (Car)', group: 'mid', level: 1 },
+                    { id: 'sportscar', label: '스포츠카 (Sports Car)', group: 'mid', level: 2 },
+                    { id: 'porsche', label: '포르쉐 911', group: 'bottom', level: 3 }
+                ];
+                const e = [
+                    { from: 'car', to: 'vehicle', label: 'SubClassOf', arrows: 'to', dashes: true },
+                    { from: 'sportscar', to: 'car', label: 'SubClassOf', arrows: 'to', dashes: true },
+                    { from: 'porsche', to: 'sportscar', label: 'Type (Instance)', arrows: 'to' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">💡 "포르쉐는 탈것인가?" 검증</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "검증 완료: 참(True)!";
+                
+                // 계층 타고 올라가는 효과 (엣지 굵게)
+                const updates = edges.get().map(edge => ({
+                    id: edge.id, width: 4, color: { color: '#3182ce' }
+                }));
+                edges.update(updates);
+                
+                // 직접적인 추론 엣지 추가
+                setTimeout(() => {
+                    edges.add({
+                        from: 'porsche', to: 'vehicle',
+                        label: '추론됨: 탈것의 일종',
+                        arrows: 'to', color: '#e53935',
+                        smooth: { type: 'curvedCW', roundness: 0.2 },
+                        font: { color: '#e53935' }
+                    });
+                    showLog(`검증 프로세스: 포르쉐 -> 스포츠카 -> 자동차 -> 탈것 계층을 따라가서 <span class='highlight-text'>참(True)</span>으로 추론했습니다.`);
+                }, 800);
+            }
+        },
+        {
+            title: "속성의 성질 (대칭과 역방향)",
+            desc: `
+                <p>온톨로지의 관계(속성)는 똑똑한 성질을 가질 수 있습니다.</p>
+                <div class="concept-box">
+                    <strong>대칭(Symmetric)</strong>: 로미오가 줄리엣을 사랑하면, 줄리엣도 로미오를 사랑합니다.<br>
+                    <strong>역방향(Inverse)</strong>: 잡스가 애플을 창립했다면, 애플은 잡스에 의해 창립된 것입니다.
+                </div>
+                <p>아래 버튼을 눌러, 기존의 단방향 화살표를 바탕으로 컴퓨터가 <strong>새로운 화살표들을 자동 생성</strong>하는 것을 확인해 보세요.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'r', label: '로미오', color: '#ffcccb' },
+                    { id: 'j', label: '줄리엣', color: '#ffcccb' },
+                    { id: 'sj', label: '잡스', color: '#bbdefb' },
+                    { id: 'ap', label: '애플', color: '#c8e6c9' }
+                ];
+                const e = [
+                    { id: 'e1', from: 'r', to: 'j', label: '사랑한다', arrows: 'to' },
+                    { id: 'e2', from: 'sj', to: 'ap', label: '창립했다', arrows: 'to' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #805ad5;">✨ 속성 규칙 적용하기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "추론 완료!";
+                edges.add([
+                    { from: 'j', to: 'r', label: '사랑한다 (대칭)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} },
+                    { from: 'ap', to: 'sj', label: '창립자에 의해 (역방향)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} }
+                ]);
+                showLog(`대칭(Symmetric) 규칙 1건, 역방향(Inverse) 규칙 1건을 적용하여 <span class='highlight-text'>새로운 관계를 추론</span>했습니다.`);
+            }
+        },
+        {
+            title: "동일 객체 인지 (SameAs)",
+            desc: `
+                <p>온톨로지에서는 서로 다른 이름으로 불리는 개체가 <strong>사실 같은 것</strong>임을 선언할 수 있습니다.</p>
+                <p>현재 그래프에는 <strong>'스티브 잡스'</strong>와 <strong>'Steve Jobs'</strong>가 분리되어 있고, 각자 연결된 데이터가 다릅니다.</p>
+                <div class="concept-box">
+                    "스티브 잡스 <code>owl:sameAs</code> Steve Jobs"
+                </div>
+                <p>버튼을 눌러 두 노드를 하나로 합치고, 양쪽의 지식이 어떻게 융합되는지 관찰해 보세요.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'sj_kr', label: '스티브 잡스', color: '#bbdefb' },
+                    { id: 'apple', label: '애플', color: '#c8e6c9' },
+                    { id: 'sj_en', label: 'Steve Jobs', color: '#e1bee7' },
+                    { id: 'pixar', label: '픽사', color: '#ffcccb' }
+                ];
+                const e = [
+                    { from: 'sj_kr', to: 'apple', label: '창립했다', arrows: 'to' },
+                    { from: 'sj_en', to: 'pixar', label: '인수했다', arrows: 'to' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #ed8936;">🔗 동일 인물 선언 (SameAs)</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "융합 완료!";
+                
+                // sj_en을 지우고, 픽사 엣지를 sj_kr로 옮김
+                edges.remove(edges.get().filter(e => e.from === 'sj_en' || e.to === 'sj_en').map(e => e.id));
+                nodes.remove('sj_en');
+                
+                nodes.update({ id: 'sj_kr', label: '스티브 잡스\n(Steve Jobs)', size: 30, color: {background: '#f6ad55', border: '#dd6b20'} });
+                
+                setTimeout(() => {
+                    edges.add({ from: 'sj_kr', to: 'pixar', label: '인수했다', arrows: 'to', color: '#dd6b20', width: 3 });
+                    showLog(`두 개체가 융합되어, 분산되어 있던 지식(애플, 픽사)이 <span class='highlight-text'>하나의 노드로 통합</span>되었습니다.`);
+                    network.fit({animation: true});
+                }, 500);
+            }
+        },
+        {
+            title: "논리의 꼬리물기 (이행적 속성)",
+            desc: `
+                <p>온톨로지의 관계 중에는 꼬리를 물고 이어지는 <strong>이행적 속성(Transitive Property)</strong>이 있습니다.</p>
+                <div class="concept-box">
+                    A가 B를 포함하고, B가 C를 포함하면, 자연스럽게 <strong>A는 C를 포함한다</strong>는 논리입니다.<br>
+                    예: 대한민국 ⊃ 서울 ⊃ 강남구
+                </div>
+                <p>아래 버튼을 눌러, 기존 관계들만으로 컴퓨터가 숨겨진 포함 관계를 자동으로 찾아내어 연결하는지 확인해 보세요.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'korea', label: '대한민국', color: '#ffb7b2' },
+                    { id: 'seoul', label: '서울특별시', color: '#ffdac1' },
+                    { id: 'gangnam', label: '강남구', color: '#e2f0cb' }
+                ];
+                const e = [
+                    { from: 'korea', to: 'seoul', label: '포함한다', arrows: 'to' },
+                    { from: 'seoul', to: 'gangnam', label: '포함한다', arrows: 'to' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #e53e3e;">🕵️ 숨겨진 포함 관계 찾기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "추론 완료!";
+                
+                setTimeout(() => {
+                    edges.add({
+                        from: 'korea', to: 'gangnam',
+                        label: '자동 추론: 포함한다',
+                        arrows: 'to',
+                        color: '#e53e3e',
+                        dashes: true,
+                        smooth: { type: 'curvedCW', roundness: 0.2 },
+                        font: { color: '#e53e3e' }
+                    });
+                    showLog(`이행적 속성(Transitive) 규칙에 의해 <span class='highlight-text'>대한민국 -> 강남구</span> 포함 관계를 추론했습니다.`);
+                }, 500);
+            }
+        },
+        {
+            title: "오류 차단하기 (도메인과 레인지)",
+            desc: `
+                <p>모든 노드가 무분별하게 연결되면 지식 그래프가 망가집니다.</p>
+                <p>이런 상황을 막기 위해 <strong>도메인(주어의 종류)</strong>과 <strong>레인지(목적어의 종류)</strong> 규칙을 적용합니다.</p>
+                <div class="concept-box">
+                    <strong>규칙:</strong> '운전하다' 속성의 주어는 무조건 [사람], 목적어는 무조건 [차량]이어야 한다.
+                </div>
+                <p>현재 그래프에는 <strong>강아지</strong>가 <strong>자동차</strong>를 운전한다는 잘못된 지식이 들어있습니다. 아래 버튼을 눌러 규칙 검사기가 어떻게 오류를 잡아내는지 확인해 보세요.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'dog', label: '강아지 (동물)', color: '#ecc94b', shape: 'box' },
+                    { id: 'car', label: '자동차 (차량)', color: '#4299e1', shape: 'box' }
+                ];
+                const e = [
+                    { id: 'wrong_edge', from: 'dog', to: 'car', label: '운전하다', arrows: 'to', color: '#718096' }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">🛡️ 논리 오류 검사기 실행</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "검사 완료: 오류 발견!";
+                
+                // 엣지 붉은색으로 강조 및 진동 느낌 부여
+                edges.update({ id: 'wrong_edge', color: '#e53e3e', width: 4, font: {color: '#e53e3e'} });
+                nodes.update({ id: 'dog', color: { background: '#feb2b2', border: '#e53e3e' } });
+                
+                showLog(`⚠️ 논리 충돌 발견! '운전하다'의 주어는 [사람]이어야 하지만, <span class='highlight-text'>[동물] 클래스</span>인 강아지가 사용되었습니다.`);
+                
+                // 잠시 후 엣지 삭제
+                setTimeout(() => {
+                    edges.remove('wrong_edge');
+                    showLog(`잘못된 지식(강아지 -> 운전하다 -> 자동차)을 지식망에서 <span class='highlight-text'>제거</span>했습니다.`);
+                }, 2000);
+            }
+        },
+        {
+            title: "나만의 지식 만들기 (자유 실습)",
+            desc: `
+                <p>이제 여러분이 직접 온톨로지 지식 그래프를 그려볼 차례입니다!</p>
+                <p>그래프 상단에 조작 메뉴(Edit 모드)가 나타났습니다.</p>
+                <ol style="margin-left: -15px;">
+                    <li><strong>Add Node</strong>: 캔버스를 클릭해 새로운 개념을 만드세요.</li>
+                    <li><strong>Add Edge</strong>: 한 노드에서 다른 노드로 드래그해 관계를 만드세요.</li>
+                    <li>노드나 화살표를 선택하고 <strong>Edit</strong>나 <strong>Delete</strong>를 할 수 있습니다.</li>
+                </ol>
+                <p>자유롭게 지식망을 설계해 보세요. 수고하셨습니다! 🎉</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'me', label: '나 (Me)', color: '#ecc94b', size: 25 }
+                ];
+                return { n, e: [] };
+            },
+            actionHtml: ``
+        },
+        {
+            title: "똑똑한 검색: SPARQL 체험하기",
+            desc: `
+                <p>온톨로지의 진짜 매력은 <strong>지능형 검색</strong>입니다!</p>
+                <p>우리가 만든 데이터는 단순한 표가 아니라 의미로 연결된 그래프입니다. 기계는 이 꼬리물기를 따라가며 똑똑하게 답을 찾을 수 있습니다.</p>
+                <div class="concept-box">
+                    <strong>목표 🎯</strong><br>
+                    마르게리타 피자에 들어간 재료 중 <strong>'채소'</strong>인 것만 찾아보세요!
+                </div>
+                <p>버튼을 누르면 내부적으로 <code>SELECT ?topping WHERE { '마르게리타' hasTopping ?topping . ?topping isA '채소' }</code> 와 같은 질의(SPARQL)가 시뮬레이션 됩니다.</p>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'pizza', label: '마르게리타 피자', color: '#f6ad55', size: 30 },
+                    { id: 'tomato', label: '토마토', color: '#fc8181', size: 20 },
+                    { id: 'cheese', label: '모짜렐라 치즈', color: '#fef08a', size: 20 },
+                    { id: 'veg', label: '채소류', color: '#9ae6b4', size: 25 },
+                    { id: 'dairy', label: '유제품', color: '#bee3f8', size: 25 }
+                ];
+                const e = [
+                    { from: 'pizza', to: 'tomato', label: 'hasTopping', arrows: 'to' },
+                    { from: 'pizza', to: 'cheese', label: 'hasTopping', arrows: 'to' },
+                    { from: 'tomato', to: 'veg', label: 'isA (속함)', arrows: 'to', dashes: true },
+                    { from: 'cheese', to: 'dairy', label: 'isA (속함)', arrows: 'to', dashes: true }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">🔍 검색 쿼리 실행하기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                showLog(`검색 중... 마르게리타의 토핑을 찾고, 그 중 '채소류'에 속하는 데이터를 걸러냅니다...`);
+                
+                setTimeout(() => {
+                    nodes.update({ 
+                        id: 'tomato', 
+                        size: 40, 
+                        color: { background: '#e53e3e', border: '#9b2c2c' },
+                        shadow: { enabled: true, color: 'rgba(229,62,62,0.8)', size: 15 }
+                    });
+                    showLog(`🎯 <strong>검색 완료!</strong> 그래프를 탐색하여 <strong>'토마토'</strong>를 찾아냈습니다! 이것이 온톨로지(SPARQL) 검색의 힘입니다.`);
+                    btn.innerText = "검색 완료!";
+                }, 1500);
+            }
+        },
+        {
+            title: "에필로그: 온톨로지 마스터를 향하여",
+            desc: `
+                <p>튜토리얼을 모두 마친 것을 축하합니다! 🎉</p>
+                <p>이제 여러분은 <strong>프로테제(Protégé)</strong>라는 전문 도구를 다룰 준비가 되었습니다.</p>
+                <div class="concept-box">
+                    <strong>Protégé (프로테제)란?</strong><br>
+                    스탠포드 대학교에서 만든 무료 온톨로지 에디터입니다. 마우스 클릭만으로 복잡한 지식 구조를 구축할 수 있습니다.
+                </div>
+                <p>전 세계 표준 입문 코스인 '피자 온톨로지' 만들기에 도전해 보세요! 바로 다운로드하고 실습할 수 있습니다.</p>
+                <ul style="margin: 10px 0 15px -15px;">
+                    <li>🔗 <a href="https://protege.stanford.edu/" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">Protégé 공식 다운로드</a></li>
+                    <li>🔗 <a href="https://protegewiki.stanford.edu/wiki/Protege4Pizzas10Minutes" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">피자 온톨로지 10분 튜토리얼 (영문 가이드)</a></li>
+                    <li style="margin-top: 5px;">📺 <a href="https://www.youtube.com/@jayjoykim/videos" target="_blank" style="color: #e53e3e; font-weight: bold; text-decoration: underline;">한국어 추천 영상 강의 (Justin Kim 님 유튜브)</a> - 영어가 부담스럽다면 이곳에서 한글 강의를 시청해 보세요!</li>
+                </ul>
+            `,
+            initData: () => {
+                const n = [
+                    { id: 'pizza', label: '피자 (Pizza)', color: '#f6ad55', size: 35, shape: 'star' },
+                    { id: 'tomato', label: '토마토', color: '#fc8181' },
+                    { id: 'cheese', label: '치즈', color: '#fef08a' },
+                    { id: 'mushroom', label: '버섯', color: '#d6bcfa' }
+                ];
+                const e = [
+                    { from: 'pizza', to: 'tomato', label: '토핑으로 가짐', arrows: 'to', dashes: true },
+                    { from: 'pizza', to: 'cheese', label: '토핑으로 가짐', arrows: 'to', dashes: true },
+                    { from: 'pizza', to: 'mushroom', label: '토핑으로 가짐', arrows: 'to', dashes: true }
+                ];
+                return { n, e };
+            },
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #dd6b20;">🍕 프로테제 피자 튜토리얼 힌트 보기</button>`,
+            onAction: (btn) => {
+                btn.disabled = true;
+                btn.innerText = "준비 완료!";
+                showLog(`💡 힌트: 공식 가이드를 따라 'Margarita Pizza' 클래스를 만들고 추론기를 돌려보세요! 앞으로의 여정을 응원합니다 🚀`);
+                
+                // 피자 노드 통통 튀는 효과
+                let scale = 1.0;
+                let grow = true;
+                const interval = setInterval(() => {
+                    scale = grow ? 1.4 : 1.0;
+                    nodes.update({ id: 'pizza', size: 35 * scale });
+                    grow = !grow;
+                }, 400);
+                setTimeout(() => clearInterval(interval), 2000);
+            }
+        }
+    ];
+
+    // 화면 렌더링 엔진
+    function renderStep(index) {
+        // ... (기존 로직 유지)
+        const step = stepsData[index];
+        
+        // 1. UI 텍스트 업데이트
+        document.getElementById('step-badge').innerText = `Step ${index + 1} / ${stepsData.length}`;
+        document.getElementById('step-title').innerText = step.title;
+        document.getElementById('step-desc').innerHTML = step.desc;
+        document.getElementById('action-container').innerHTML = step.actionHtml;
+        
+        // 2. 프로그레스 닷 동적 업데이트
+        const progressContainer = document.getElementById('progress-dots');
+        progressContainer.innerHTML = ''; // 초기화
+        for (let i = 0; i < stepsData.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'step-dot';
+            if (i === index) dot.classList.add('active');
+            progressContainer.appendChild(dot);
+        }
+
+        // 3. 버튼 상태 제어
+        document.getElementById('btn-prev').disabled = (index === 0);
+        document.getElementById('btn-next').disabled = false; // 항상 활성화하여 학습 완료 버튼 동작하게 함
+        
+        const btnNext = document.getElementById('btn-next');
+        if(index === stepsData.length - 1) {
+            btnNext.innerText = "학습 완료 🎉";
+            btnNext.style.backgroundColor = '#48bb78'; // 초록색 강조
+            btnNext.style.color = 'white';
+            btnNext.classList.remove('primary');
+        } else {
+            btnNext.innerText = "다음 단계 →";
+            btnNext.style.backgroundColor = '';
+            btnNext.style.color = '';
+            btnNext.classList.add('primary');
+        }
+
+        // 4. 로그창 숨기기
+        hideLog();
+
+        // 5. 네트워크 데이터 교체
+        const init = step.initData();
+        nodes = new vis.DataSet(init.n);
+        edges = new vis.DataSet(init.e);
+        
+        let customOptions = { ...defaultOptions };
+        
+        // 4단계인 경우 계층구조 레이아웃 적용, 7단계인 경우 manipulation 활성화
+        if(index === 3) {
+            customOptions.layout = { hierarchical: { direction: 'UD', sortMethod: 'directed' } };
+            customOptions.physics = { enabled: false }; // 고정 레이아웃
+            customOptions.manipulation = { enabled: false };
+        } else if(index >= stepsData.length - 2) { // 9단계(자유실습) 및 10단계(에필로그) 자유 조작
+            customOptions.layout = { hierarchical: false };
+            customOptions.physics = { enabled: true, solver: 'forceAtlas2Based' };
+            customOptions.manipulation = { 
+                enabled: true, // 자유 조작 활성화
+                addNode: function(data, callback) {
+                    const label = prompt("새로운 개념(노드)의 이름을 입력하세요:", "");
+                    if (label !== null) {
+                        data.label = label;
+                        callback(data);
+                    } else {
+                        callback(null);
+                    }
+                },
+                editNode: function(data, callback) {
+                    const label = prompt("개념(노드)의 이름을 변경하세요:", data.label || "");
+                    if (label !== null) {
+                        data.label = label;
+                        callback(data);
+                    } else {
+                        callback(null);
+                    }
+                },
+                addEdge: function(data, callback) {
+                    if (data.from === data.to) {
+                        alert("자신에게는 관계를 연결할 수 없습니다.");
+                        callback(null);
+                        return;
+                    }
+                    const label = prompt("두 개념 사이의 관계(Edge)를 입력하세요:", "");
+                    if (label !== null) {
+                        data.label = label;
+                        data.arrows = 'to'; // 방향성 화살표 기본 추가
+                        callback(data);
+                    } else {
+                        callback(null);
+                    }
+                },
+                editEdge: {
+                    editWithoutDrag: function(data, callback) {
+                        const label = prompt("관계(Edge)의 이름을 변경하세요:", data.label || "");
+                        if (label !== null) {
+                            data.label = label;
+                            callback(data);
+                        } else {
+                            callback(null);
+                        }
+                    }
+                }
+            };
+        } else {
+            customOptions.layout = { hierarchical: false };
+            customOptions.physics = { enabled: true, solver: 'forceAtlas2Based' };
+            customOptions.manipulation = { enabled: false };
+        }
+
+        if(network) network.destroy();
+        network = new vis.Network(
+            document.getElementById('network'),
+            { nodes: nodes, edges: edges },
+            customOptions
+        );
+
+        // 강제 리렌더링: 컨테이너 크기가 비동기적으로 잡힐 때 발생하는 렌더링 누락 방지
+        setTimeout(() => {
+            if(network) network.fit({ animation: false });
+        }, 50);
+
+        // 6. 특수 액션 버튼 리스너 등록
+        const actionBtn = document.getElementById('action-btn');
+        if(actionBtn && step.onAction) {
+            actionBtn.addEventListener('click', function() {
+                step.onAction(this);
+            });
+        }
+    }
+
+    // 초기 실행 (폰트 로드 확인 후 렌더링)
+    window.onload = () => {
+        // 브라우저가 준비될 때까지 안전하게 대기
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => {
+                renderStep(0);
+            });
+        } else {
+            // 구형 브라우저 fallback
+            renderStep(0);
+        }
+        
+        // 네비게이션 이벤트 리스너
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            if(currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep(currentStepIndex);
+            }
+        });
+        
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if(currentStepIndex < stepsData.length - 1) {
+                currentStepIndex++;
+                renderStep(currentStepIndex);
+            } else if (currentStepIndex === stepsData.length - 1) {
+                alert("🎉 모든 온톨로지 마스터 클래스를 성공적으로 완료하셨습니다! 수고하셨습니다.");
+            }
+        });
+    };
+</script>
+
+</body>
+</html>
