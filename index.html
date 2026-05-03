@@ -207,179 +207,173 @@
             title: "트리플(Triple)의 이해",
             desc: `
                 <p>온톨로지의 세계에 오신 것을 환영합니다! 🎉</p>
-                <p>온톨로지의 가장 기본적인 단위는 주어, 동사, 목적어로 이루어진 <strong>트리플(Triple)</strong>입니다.</p>
+                <p>지식의 가장 기본적인 단위는 주어, 동사, 목적어로 이루어진 <strong>트리플(Triple)</strong>입니다.</p>
                 <div class="concept-box">
-                    <strong>"스티브 잡스(주어)는 애플(목적어)을 창립했다(동사)"</strong><br><br>
-                    또한, 이 트리플들이 꼬리를 물고 연결되면 더 큰 지식이 됩니다.<br>
-                    "애플은 <strong>아이폰</strong>을 만들고", "아이폰은 <strong>스마트폰</strong>의 일종이다" 처럼요.
+                    <strong>"김복지(주어)는 희망복지관(목적어)에 근무한다(동사)"</strong><br><br>
+                    또한, 이 트리플들이 꼬리를 물고 연결되면 복잡한 복지 자원망이 됩니다.<br>
+                    "희망복지관은 <strong>노인돌봄</strong>을 제공하고", "노인돌봄은 <strong>복지서비스</strong>의 일종이다" 처럼요.
                 </div>
-                <p>오른쪽 그래프를 보세요. 단어(노드)와 관계(화살표)가 연결되면서 하나의 지식 그물망이 만들어진 것을 확인할 수 있습니다.</p>
+                <p>오른쪽 그래프를 보세요. 사람과 기관, 서비스가 연결되면서 하나의 지식 그물망이 만들어진 것을 확인할 수 있습니다.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 1, label: '스티브 잡스', color: { background: '#ffcccb', border: '#e53935' } },
-                    { id: 2, label: '애플', color: { background: '#c8e6c9', border: '#43a047' } },
-                    { id: 3, label: '아이폰', color: { background: '#bbdefb', border: '#1e88e5' } },
-                    { id: 4, label: '스마트폰', color: { background: '#e1bee7', border: '#8e24aa' } }
+                    { id: 1, label: '김복지\n(사회복지사)', color: { background: '#ffcccb', border: '#e53935' } },
+                    { id: 2, label: '희망복지관', color: { background: '#c8e6c9', border: '#43a047' } },
+                    { id: 3, label: '노인돌봄', color: { background: '#bbdefb', border: '#1e88e5' } },
+                    { id: 4, label: '복지서비스', color: { background: '#e1bee7', border: '#8e24aa' } }
                 ];
                 const e = [
-                    { from: 1, to: 2, label: '창립했다 (founded)', arrows: 'to' },
-                    { from: 2, to: 3, label: '만들다 (creates)', arrows: 'to' },
-                    { from: 3, to: 4, label: '일종이다 (is a type of)', arrows: 'to' }
+                    { from: 1, to: 2, label: '근무한다', arrows: 'to' },
+                    { from: 2, to: 3, label: '제공한다', arrows: 'to' },
+                    { from: 3, to: 4, label: '일종이다 (is a)', arrows: 'to' }
                 ];
                 return { n, e };
             },
             actionHtml: `` // 특수 액션 없음
         },
         {
-            title: "추론 (Inference)",
+            title: "추론 (Inference) - 가계도",
             desc: `
                 <p>온톨로지가 일반 데이터베이스보다 뛰어난 점은 바로 <strong>'추론'</strong>입니다.</p>
-                <p>아래 그래프에는 우리가 입력한 <strong>'아빠이다(검은 실선)'</strong> 관계만 존재합니다.</p>
+                <p>아래 가계도 그래프에는 우리가 직접 입력한 <strong>'부모이다(검은 실선)'</strong> 관계만 존재합니다.</p>
                 <div class="concept-box">
-                    하지만 컴퓨터에게 <strong>"아빠의 아빠는 할아버지다"</strong>라는 규칙을 알려주면 어떨까요?
+                    하지만 컴퓨터에게 <strong>"부모의 부모는 조부모(조손가정의 기준)이다"</strong>라는 규칙을 알려주면 어떨까요?
                 </div>
-                <p>아래 버튼을 눌러 인공지능이 숨겨진 관계를 스스로 찾아내는 것을 확인해 보세요!</p>
+                <p>아래 버튼을 눌러 인공지능이 사례관리 대상자의 숨겨진 가족 관계를 스스로 찾아내는 것을 확인해 보세요!</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'c', label: '철수 (1세대)', shape: 'box', color: '#ffcccb' },
-                    { id: 'm', label: '민수 (2세대)', shape: 'box', color: '#c8e6c9' },
-                    { id: 'y', label: '영희 (2세대)', shape: 'box', color: '#c8e6c9' },
-                    { id: 'h', label: '지훈 (3세대)', shape: 'box', color: '#bbdefb' },
-                    { id: 's', label: '지수 (3세대)', shape: 'box', color: '#bbdefb' }
+                    { id: 'c', label: '김어르신 (1세대)', shape: 'box', color: '#ffcccb' },
+                    { id: 'm', label: '김아들 (2세대)', shape: 'box', color: '#c8e6c9' },
+                    { id: 'y', label: '김딸 (2세대)', shape: 'box', color: '#c8e6c9' },
+                    { id: 'h', label: '최손자 (3세대)', shape: 'box', color: '#bbdefb' },
+                    { id: 's', label: '이손녀 (3세대)', shape: 'box', color: '#bbdefb' }
                 ];
                 const e = [
-                    { from: 'c', to: 'm', label: '아빠이다', arrows: 'to', color: '#333' },
-                    { from: 'c', to: 'y', label: '아빠이다', arrows: 'to', color: '#333' },
-                    { from: 'm', to: 'h', label: '아빠이다', arrows: 'to', color: '#333' },
-                    { from: 'm', to: 's', label: '아빠이다', arrows: 'to', color: '#333' }
+                    { from: 'c', to: 'm', label: '부모이다', arrows: 'to', color: '#333' },
+                    { from: 'c', to: 'y', label: '부모이다', arrows: 'to', color: '#333' },
+                    { from: 'm', to: 'h', label: '부모이다', arrows: 'to', color: '#333' },
+                    { from: 'y', to: 's', label: '부모이다', arrows: 'to', color: '#333' }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn">🚀 인공지능 추론 시작하기</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn">🚀 가계도 인공지능 추론 시작</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "추론 완료!";
                 
-                // 할아버지 규칙: c -> m -> h,s
                 edges.add([
-                    { from: 'c', to: 'h', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
-                    { from: 'c', to: 's', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
-                    { from: 'm', to: 'y', label: '형제자매이다', arrows: 'to,from', color: '#8e24aa', dashes: true, font:{color:'#8e24aa'} },
-                    { from: 'h', to: 's', label: '형제자매이다', arrows: 'to,from', color: '#8e24aa', dashes: true, font:{color:'#8e24aa'} }
+                    { from: 'c', to: 'h', label: '조부모이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { from: 'c', to: 's', label: '조부모이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { from: 'm', to: 'y', label: '형제자매이다', arrows: 'to,from', color: '#8e24aa', dashes: true, font:{color:'#8e24aa'} }
                 ]);
-                showLog("추론 완료: <span class='highlight-text'>할아버지 관계 2건, 형제 관계 2건</span>을 새롭게 발견했습니다!");
+                showLog("추론 완료: <span class='highlight-text'>조부모 관계 2건, 형제 관계 1건</span>을 새롭게 발견했습니다!");
             }
         },
         {
             title: "지식에 질문 던지기 (SPARQL)",
             desc: `
-                <p>이제 복잡해진 지식 그래프에서 원하는 데이터만 뽑아내야 합니다.</p>
+                <p>이제 복잡해진 지식 그래프에서 원하는 대상자 데이터만 뽑아내야 합니다.</p>
                 <p>온톨로지에서는 <strong>SPARQL(스파클)</strong>이라는 쿼리 언어로 데이터베이스에 질문을 던집니다.</p>
                 <div class="concept-box">
-                    "모든 사람 중에서, '할아버지'라는 관계를 가진 사람의 '손자/손녀'들만 찾아줘!"
+                    "가계도에서 '조부모' 관계를 가진 대상자 중 3세대(손주)를 찾아 조손가정 지원 가능 여부를 검토해줘!"
                 </div>
-                <p>아래 버튼을 눌러 컴퓨터가 쿼리에 맞는 대상을 찾아 <strong>노란색</strong>으로 강조하는 걸 확인해 보세요.</p>
+                <p>아래 버튼을 눌러 컴퓨터가 조건에 맞는 대상자를 찾아 <strong>노란색</strong>으로 강조하는 걸 확인해 보세요.</p>
             `,
             initData: () => {
-                // 2단계에서 추론이 끝난 상태를 초기 상태로 가정
                 const { n, e } = stepsData[1].initData();
                 const inferredEdges = [
-                    { id: 'e_h1', from: 'c', to: 'h', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
-                    { id: 'e_h2', from: 'c', to: 's', label: '할아버지이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} }
+                    { id: 'e_h1', from: 'c', to: 'h', label: '조부모이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} },
+                    { id: 'e_h2', from: 'c', to: 's', label: '조부모이다', arrows: 'to', color: '#e53935', dashes: true, font:{color:'#e53935'} }
                 ];
                 return { n, e: e.concat(inferredEdges) };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #d69e2e;">🔍 3세대(손주)만 검색하기</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #d69e2e;">🔍 조손가정 3세대(손주) 검색하기</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "검색 완료!";
-                // SPARQL의 결과를 시뮬레이션: 할아버지 관계를 받는(to) 노드만 강조
                 const allEdges = edges.get();
-                const targets = allEdges.filter(e => e.label === '할아버지이다').map(e => e.to);
+                const targets = allEdges.filter(e => e.label === '조부모이다').map(e => e.to);
                 
                 targets.forEach(id => {
                     nodes.update({ 
                         id: id, 
                         color: { background: '#ecc94b', border: '#b7791f' },
                         shadow: { color: '#ecc94b', size: 20 },
-                        size: 30, // 크기 키우기 (shape: box일때는 폰트 조정으로 크기를 키움)
+                        size: 30, 
                         font: { size: 22, color: 'white' }
                     });
                 });
-                network.fit({ nodes: targets, animation: true }); // 타겟으로 카메라 줌
-                showLog(`SPARQL 쿼리 결과: 철수의 손주인 <span class='highlight-text'>지훈, 지수</span> 노드를 찾았습니다.`);
+                network.fit({ nodes: targets, animation: true }); 
+                showLog(`SPARQL 쿼리 결과: 김어르신의 손주인 <span class='highlight-text'>최손자, 이손녀</span>를 찾아 조손가정 대상자로 식별했습니다.`);
             }
         },
         {
-            title: "계층 구조 (Taxonomy)",
+            title: "복지서비스 계층 구조 (Taxonomy)",
             desc: `
                 <p>온톨로지의 또 다른 핵심은 <strong>분류와 상속(Class & SubClass)</strong>입니다.</p>
-                <p>컴퓨터에게 <strong>"모든 스포츠카는 자동차다"</strong>라고 알려주면, 개별 스포츠카 모델이 자동차라는 것을 일일이 입력하지 않아도 자동으로 알게 됩니다.</p>
+                <p>컴퓨터에게 <strong>"모든 재가노인복지는 사회복지서비스다"</strong>라고 알려주면, 개별 서비스 항목을 일일이 상위 개념에 등록하지 않아도 자동으로 알게 됩니다.</p>
                 <div class="concept-box">
-                    포르쉐 911 -> (is a) -> 스포츠카 -> (is a) -> 자동차 -> (is a) -> 탈것
+                    방문목욕 -> (is a) -> 재가노인서비스 -> (is a) -> 노인복지서비스 -> (is a) -> 사회복지서비스
                 </div>
-                <p>아래 버튼을 누르면 <strong>"포르쉐 911은 탈것인가?"</strong>라는 질문에 대해 컴퓨터가 계층을 타고 올라가며 검증합니다.</p>
+                <p>아래 버튼을 누르면 <strong>"방문목욕은 사회복지서비스인가?"</strong>라는 질문에 대해 컴퓨터가 계층을 타고 올라가며 검증합니다.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'vehicle', label: '탈것 (Vehicle)', group: 'top', level: 0 },
-                    { id: 'car', label: '자동차 (Car)', group: 'mid', level: 1 },
-                    { id: 'sportscar', label: '스포츠카 (Sports Car)', group: 'mid', level: 2 },
-                    { id: 'porsche', label: '포르쉐 911', group: 'bottom', level: 3 }
+                    { id: 'welfare', label: '사회복지서비스', group: 'top', level: 0 },
+                    { id: 'elderly', label: '노인복지서비스', group: 'mid', level: 1 },
+                    { id: 'homecare', label: '재가노인서비스', group: 'mid', level: 2 },
+                    { id: 'bath', label: '방문목욕', group: 'bottom', level: 3 }
                 ];
                 const e = [
-                    { from: 'car', to: 'vehicle', label: 'SubClassOf', arrows: 'to', dashes: true },
-                    { from: 'sportscar', to: 'car', label: 'SubClassOf', arrows: 'to', dashes: true },
-                    { from: 'porsche', to: 'sportscar', label: 'Type (Instance)', arrows: 'to' }
+                    { from: 'elderly', to: 'welfare', label: 'SubClassOf', arrows: 'to', dashes: true },
+                    { from: 'homecare', to: 'elderly', label: 'SubClassOf', arrows: 'to', dashes: true },
+                    { from: 'bath', to: 'homecare', label: 'Type (Instance)', arrows: 'to' }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">💡 "포르쉐는 탈것인가?" 검증</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">💡 "방문목욕은 사회복지서비스인가?" 검증</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "검증 완료: 참(True)!";
                 
-                // 계층 타고 올라가는 효과 (엣지 굵게)
                 const updates = edges.get().map(edge => ({
                     id: edge.id, width: 4, color: { color: '#3182ce' }
                 }));
                 edges.update(updates);
                 
-                // 직접적인 추론 엣지 추가
                 setTimeout(() => {
                     edges.add({
-                        from: 'porsche', to: 'vehicle',
-                        label: '추론됨: 탈것의 일종',
+                        from: 'bath', to: 'welfare',
+                        label: '추론됨: 사회복지의 일종',
                         arrows: 'to', color: '#e53935',
                         smooth: { type: 'curvedCW', roundness: 0.2 },
                         font: { color: '#e53935' }
                     });
-                    showLog(`검증 프로세스: 포르쉐 -> 스포츠카 -> 자동차 -> 탈것 계층을 따라가서 <span class='highlight-text'>참(True)</span>으로 추론했습니다.`);
+                    showLog(`검증 프로세스: 방문목욕 -> 재가노인서비스 -> 노인복지 -> 사회복지 계층을 따라가서 <span class='highlight-text'>참(True)</span>으로 추론했습니다.`);
                 }, 800);
             }
         },
         {
-            title: "속성의 성질 (대칭과 역방향)",
+            title: "사례관리 네트워크 (대칭과 역방향)",
             desc: `
-                <p>온톨로지의 관계(속성)는 똑똑한 성질을 가질 수 있습니다.</p>
+                <p>온톨로지의 관계(속성)는 똑똑한 논리적 성질을 가질 수 있습니다.</p>
                 <div class="concept-box">
-                    <strong>대칭(Symmetric)</strong>: 로미오가 줄리엣을 사랑하면, 줄리엣도 로미오를 사랑합니다.<br>
-                    <strong>역방향(Inverse)</strong>: 잡스가 애플을 창립했다면, 애플은 잡스에 의해 창립된 것입니다.
+                    <strong>대칭(Symmetric)</strong>: 복지사 A가 복지사 B와 협력하면, B도 A와 협력하는 것입니다.<br>
+                    <strong>역방향(Inverse)</strong>: 복지관이 대상자를 지원한다면, 대상자는 복지관에 의해 지원받는 것입니다.
                 </div>
-                <p>아래 버튼을 눌러, 기존의 단방향 화살표를 바탕으로 컴퓨터가 <strong>새로운 화살표들을 자동 생성</strong>하는 것을 확인해 보세요.</p>
+                <p>아래 버튼을 눌러, 기존의 단방향 화살표를 바탕으로 컴퓨터가 <strong>숨겨진 반대/양방향 화살표들을 자동 생성</strong>하는 것을 확인해 보세요.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'r', label: '로미오', color: '#ffcccb' },
-                    { id: 'j', label: '줄리엣', color: '#ffcccb' },
-                    { id: 'sj', label: '잡스', color: '#bbdefb' },
-                    { id: 'ap', label: '애플', color: '#c8e6c9' }
+                    { id: 'w1', label: '사례관리자 A', color: '#ffcccb' },
+                    { id: 'w2', label: '사례관리자 B', color: '#ffcccb' },
+                    { id: 'org', label: '지역복지관', color: '#bbdefb' },
+                    { id: 'client', label: '도움 대상자', color: '#c8e6c9' }
                 ];
                 const e = [
-                    { id: 'e1', from: 'r', to: 'j', label: '사랑한다', arrows: 'to' },
-                    { id: 'e2', from: 'sj', to: 'ap', label: '창립했다', arrows: 'to' }
+                    { id: 'e1', from: 'w1', to: 'w2', label: '협력한다', arrows: 'to' },
+                    { id: 'e2', from: 'org', to: 'client', label: '지원한다', arrows: 'to' }
                 ];
                 return { n, e };
             },
@@ -388,76 +382,75 @@
                 btn.disabled = true;
                 btn.innerText = "추론 완료!";
                 edges.add([
-                    { from: 'j', to: 'r', label: '사랑한다 (대칭)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} },
-                    { from: 'ap', to: 'sj', label: '창립자에 의해 (역방향)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} }
+                    { from: 'w2', to: 'w1', label: '협력한다 (대칭)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} },
+                    { from: 'client', to: 'org', label: '지원받는다 (역방향)', arrows: 'to', color: '#805ad5', dashes: true, font: {color: '#805ad5'} }
                 ]);
-                showLog(`대칭(Symmetric) 규칙 1건, 역방향(Inverse) 규칙 1건을 적용하여 <span class='highlight-text'>새로운 관계를 추론</span>했습니다.`);
+                showLog(`대칭(Symmetric) 규칙 1건, 역방향(Inverse) 규칙 1건을 적용하여 <span class='highlight-text'>새로운 자원망 관계를 추론</span>했습니다.`);
             }
         },
         {
-            title: "동일 객체 인지 (SameAs)",
+            title: "중복자 데이터 융합 (SameAs)",
             desc: `
-                <p>온톨로지에서는 서로 다른 이름으로 불리는 개체가 <strong>사실 같은 것</strong>임을 선언할 수 있습니다.</p>
-                <p>현재 그래프에는 <strong>'스티브 잡스'</strong>와 <strong>'Steve Jobs'</strong>가 분리되어 있고, 각자 연결된 데이터가 다릅니다.</p>
+                <p>온톨로지에서는 서로 다른 시스템에 등록된 데이터가 <strong>사실 동일 인물</strong>임을 선언하여 지식을 합칠 수 있습니다.</p>
+                <p>현재 그래프에는 종이 차트의 <strong>'김철수'</strong>와 전산망의 <strong>'클라이언트_123'</strong>이 분리되어 있습니다.</p>
                 <div class="concept-box">
-                    "스티브 잡스 <code>owl:sameAs</code> Steve Jobs"
+                    "김철수 <code>owl:sameAs</code> 클라이언트_123"
                 </div>
-                <p>버튼을 눌러 두 노드를 하나로 합치고, 양쪽의 지식이 어떻게 융합되는지 관찰해 보세요.</p>
+                <p>버튼을 눌러 두 데이터를 하나로 합치고, 초기상담 기록과 수급자 이력이 어떻게 융합되는지 관찰해 보세요.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'sj_kr', label: '스티브 잡스', color: '#bbdefb' },
-                    { id: 'apple', label: '애플', color: '#c8e6c9' },
-                    { id: 'sj_en', label: 'Steve Jobs', color: '#e1bee7' },
-                    { id: 'pixar', label: '픽사', color: '#ffcccb' }
+                    { id: 'kim', label: '김철수', color: '#bbdefb' },
+                    { id: 'record', label: '초기상담 (서면)', color: '#c8e6c9' },
+                    { id: 'c123', label: '클라이언트_123', color: '#e1bee7' },
+                    { id: 'history', label: '기초수급이력 (전산)', color: '#ffcccb' }
                 ];
                 const e = [
-                    { from: 'sj_kr', to: 'apple', label: '창립했다', arrows: 'to' },
-                    { from: 'sj_en', to: 'pixar', label: '인수했다', arrows: 'to' }
+                    { from: 'kim', to: 'record', label: '보유함', arrows: 'to' },
+                    { from: 'c123', to: 'history', label: '가짐', arrows: 'to' }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #ed8936;">🔗 동일 인물 선언 (SameAs)</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #ed8936;">🔗 동일 인물 선언 (데이터 통합)</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "융합 완료!";
                 
-                // sj_en을 지우고, 픽사 엣지를 sj_kr로 옮김
-                edges.remove(edges.get().filter(e => e.from === 'sj_en' || e.to === 'sj_en').map(e => e.id));
-                nodes.remove('sj_en');
+                edges.remove(edges.get().filter(e => e.from === 'c123' || e.to === 'c123').map(e => e.id));
+                nodes.remove('c123');
                 
-                nodes.update({ id: 'sj_kr', label: '스티브 잡스\n(Steve Jobs)', size: 30, color: {background: '#f6ad55', border: '#dd6b20'} });
+                nodes.update({ id: 'kim', label: '김철수\n(통합 데이터)', size: 30, color: {background: '#f6ad55', border: '#dd6b20'} });
                 
                 setTimeout(() => {
-                    edges.add({ from: 'sj_kr', to: 'pixar', label: '인수했다', arrows: 'to', color: '#dd6b20', width: 3 });
-                    showLog(`두 개체가 융합되어, 분산되어 있던 지식(애플, 픽사)이 <span class='highlight-text'>하나의 노드로 통합</span>되었습니다.`);
+                    edges.add({ from: 'kim', to: 'history', label: '가짐 (이관됨)', arrows: 'to', color: '#dd6b20', width: 3 });
+                    showLog(`두 개체가 융합되어, 분산되어 있던 복지 이력이 <span class='highlight-text'>하나의 대상자 노드로 통합</span>되었습니다.`);
                     network.fit({animation: true});
                 }, 500);
             }
         },
         {
-            title: "논리의 꼬리물기 (이행적 속성)",
+            title: "전달체계의 꼬리물기 (이행적 속성)",
             desc: `
                 <p>온톨로지의 관계 중에는 꼬리를 물고 이어지는 <strong>이행적 속성(Transitive Property)</strong>이 있습니다.</p>
                 <div class="concept-box">
-                    A가 B를 포함하고, B가 C를 포함하면, 자연스럽게 <strong>A는 C를 포함한다</strong>는 논리입니다.<br>
-                    예: 대한민국 ⊃ 서울 ⊃ 강남구
+                    A가 B의 상위 행정기관이고, B가 C의 상위 행정기관이면, 자연스럽게 <strong>A는 C의 상위 행정기관이다</strong>는 논리입니다.<br>
+                    예: 보건복지부 ⊃ 서울시청 ⊃ 자치구 복지정책과
                 </div>
-                <p>아래 버튼을 눌러, 기존 관계들만으로 컴퓨터가 숨겨진 포함 관계를 자동으로 찾아내어 연결하는지 확인해 보세요.</p>
+                <p>아래 버튼을 눌러, 기본 관계들만으로 컴퓨터가 숨겨진 복지 전달체계를 자동으로 찾아내어 연결하는지 확인해 보세요.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'korea', label: '대한민국', color: '#ffb7b2' },
-                    { id: 'seoul', label: '서울특별시', color: '#ffdac1' },
-                    { id: 'gangnam', label: '강남구', color: '#e2f0cb' }
+                    { id: 'korea', label: '보건복지부', color: '#ffb7b2' },
+                    { id: 'seoul', label: '서울시청', color: '#ffdac1' },
+                    { id: 'gangnam', label: '자치구 복지정책과', color: '#e2f0cb' }
                 ];
                 const e = [
-                    { from: 'korea', to: 'seoul', label: '포함한다', arrows: 'to' },
-                    { from: 'seoul', to: 'gangnam', label: '포함한다', arrows: 'to' }
+                    { from: 'korea', to: 'seoul', label: '상위기관이다', arrows: 'to' },
+                    { from: 'seoul', to: 'gangnam', label: '상위기관이다', arrows: 'to' }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #e53e3e;">🕵️ 숨겨진 포함 관계 찾기</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #e53e3e;">🕵️ 숨겨진 전달체계 추론하기</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "추론 완료!";
@@ -465,34 +458,34 @@
                 setTimeout(() => {
                     edges.add({
                         from: 'korea', to: 'gangnam',
-                        label: '자동 추론: 포함한다',
+                        label: '자동 추론: 상위기관이다',
                         arrows: 'to',
                         color: '#e53e3e',
                         dashes: true,
                         smooth: { type: 'curvedCW', roundness: 0.2 },
                         font: { color: '#e53e3e' }
                     });
-                    showLog(`이행적 속성(Transitive) 규칙에 의해 <span class='highlight-text'>대한민국 -> 강남구</span> 포함 관계를 추론했습니다.`);
+                    showLog(`이행적 속성(Transitive) 규칙에 의해 <span class='highlight-text'>보건복지부 -> 자치구 복지정책과</span> 연결을 추론했습니다.`);
                 }, 500);
             }
         },
         {
             title: "오류 차단하기 (도메인과 레인지)",
             desc: `
-                <p>모든 노드가 무분별하게 연결되면 지식 그래프가 망가집니다.</p>
-                <p>이런 상황을 막기 위해 <strong>도메인(주어의 종류)</strong>과 <strong>레인지(목적어의 종류)</strong> 규칙을 적용합니다.</p>
+                <p>모든 노드가 무분별하게 연결되면 지식망이 망가집니다.</p>
+                <p>이런 상황을 막기 위해 <strong>도메인(주어의 속성)</strong>과 <strong>레인지(목적어의 속성)</strong> 규칙을 적용합니다.</p>
                 <div class="concept-box">
-                    <strong>규칙:</strong> '운전하다' 속성의 주어는 무조건 [사람], 목적어는 무조건 [차량]이어야 한다.
+                    <strong>규칙:</strong> '복지서비스 제공'의 대상(목적어)은 무조건 [사람(클라이언트)]이어야 한다.
                 </div>
-                <p>현재 그래프에는 <strong>강아지</strong>가 <strong>자동차</strong>를 운전한다는 잘못된 지식이 들어있습니다. 아래 버튼을 눌러 규칙 검사기가 어떻게 오류를 잡아내는지 확인해 보세요.</p>
+                <p>현재 그래프에는 <strong>요양보호 서비스</strong>를 <strong>데스크탑 PC</strong>에게 제공한다는 잘못된 입력이 들어있습니다. 아래 버튼을 눌러 규칙 검사기가 어떻게 오류를 잡아내는지 확인해 보세요.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'dog', label: '강아지 (동물)', color: '#ecc94b', shape: 'box' },
-                    { id: 'car', label: '자동차 (차량)', color: '#4299e1', shape: 'box' }
+                    { id: 'service', label: '요양보호 (서비스)', color: '#ecc94b', shape: 'box' },
+                    { id: 'pc', label: '데스크탑 PC (기기)', color: '#4299e1', shape: 'box' }
                 ];
                 const e = [
-                    { id: 'wrong_edge', from: 'dog', to: 'car', label: '운전하다', arrows: 'to', color: '#718096' }
+                    { id: 'wrong_edge', from: 'service', to: 'pc', label: '제공하다', arrows: 'to', color: '#718096' }
                 ];
                 return { n, e };
             },
@@ -501,85 +494,83 @@
                 btn.disabled = true;
                 btn.innerText = "검사 완료: 오류 발견!";
                 
-                // 엣지 붉은색으로 강조 및 진동 느낌 부여
                 edges.update({ id: 'wrong_edge', color: '#e53e3e', width: 4, font: {color: '#e53e3e'} });
-                nodes.update({ id: 'dog', color: { background: '#feb2b2', border: '#e53e3e' } });
+                nodes.update({ id: 'pc', color: { background: '#feb2b2', border: '#e53e3e' } });
                 
-                showLog(`⚠️ 논리 충돌 발견! '운전하다'의 주어는 [사람]이어야 하지만, <span class='highlight-text'>[동물] 클래스</span>인 강아지가 사용되었습니다.`);
+                showLog(`⚠️ 논리 충돌 발견! '제공하다'의 대상은 [사람]이어야 하지만, <span class='highlight-text'>[기기] 클래스</span>인 데스크탑 PC가 사용되었습니다.`);
                 
-                // 잠시 후 엣지 삭제
                 setTimeout(() => {
                     edges.remove('wrong_edge');
-                    showLog(`잘못된 지식(강아지 -> 운전하다 -> 자동차)을 지식망에서 <span class='highlight-text'>제거</span>했습니다.`);
+                    showLog(`잘못된 지식(요양보호 -> 제공하다 -> 데스크탑 PC)을 지식망에서 <span class='highlight-text'>제거</span>했습니다.`);
                 }, 2000);
             }
         },
         {
-            title: "나만의 지식 만들기 (자유 실습)",
+            title: "나만의 복지자원망 만들기 (자유 실습)",
             desc: `
-                <p>이제 여러분이 직접 온톨로지 지식 그래프를 그려볼 차례입니다!</p>
+                <p>이제 여러분이 직접 사회복지 자원망(Eco-Map) 그래프를 그려볼 차례입니다!</p>
                 <p>그래프 상단에 조작 메뉴(Edit 모드)가 나타났습니다.</p>
                 <ol style="margin-left: -15px;">
-                    <li><strong>Add Node</strong>: 캔버스를 클릭해 새로운 개념을 만드세요.</li>
-                    <li><strong>Add Edge</strong>: 한 노드에서 다른 노드로 드래그해 관계를 만드세요.</li>
+                    <li><strong>Add Node</strong>: 캔버스를 클릭해 복지관, 병원, 대상자 등 새로운 자원을 만드세요.</li>
+                    <li><strong>Add Edge</strong>: 한 노드에서 다른 노드로 드래그해 관계를 연결하세요.</li>
                     <li>노드나 화살표를 선택하고 <strong>Edit</strong>나 <strong>Delete</strong>를 할 수 있습니다.</li>
                 </ol>
-                <p>자유롭게 지식망을 설계해 보세요. 수고하셨습니다! 🎉</p>
+                <p>자유롭게 여러분만의 복지 네트워크를 설계해 보세요! 🎉</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'me', label: '나 (Me)', color: '#ecc94b', size: 25 }
+                    { id: 'me', label: '나\n(담당 사회복지사)', color: '#ecc94b', size: 25 }
                 ];
                 return { n, e: [] };
             },
             actionHtml: ``
         },
         {
-            title: "똑똑한 검색: SPARQL 체험하기",
+            title: "똑똑한 검색: 복지 프로그램 자원 찾기",
             desc: `
                 <p>온톨로지의 진짜 매력은 <strong>지능형 검색</strong>입니다!</p>
                 <p>우리가 만든 데이터는 단순한 표가 아니라 의미로 연결된 그래프입니다. 기계는 이 꼬리물기를 따라가며 똑똑하게 답을 찾을 수 있습니다.</p>
                 <div class="concept-box">
                     <strong>목표 🎯</strong><br>
-                    마르게리타 피자에 들어간 재료 중 <strong>'채소'</strong>인 것만 찾아보세요!
+                    치매가족지원 프로그램에 필요한 자원 중 <strong>'인적자원(전문가)'</strong>인 것만 찾아보세요!
                 </div>
-                <p>버튼을 누르면 내부적으로 <code>SELECT ?topping WHERE { '마르게리타' hasTopping ?topping . ?topping isA '채소' }</code> 와 같은 질의(SPARQL)가 시뮬레이션 됩니다.</p>
+                <p>버튼을 누르면 내부적으로 연계 자원망을 탐색하는 SPARQL 질의가 시뮬레이션 됩니다.</p>
             `,
             initData: () => {
                 const n = [
-                    { id: 'pizza', label: '마르게리타 피자', color: '#f6ad55', size: 30 },
-                    { id: 'tomato', label: '토마토', color: '#fc8181', size: 20 },
-                    { id: 'cheese', label: '모짜렐라 치즈', color: '#fef08a', size: 20 },
-                    { id: 'veg', label: '채소류', color: '#9ae6b4', size: 25 },
-                    { id: 'dairy', label: '유제품', color: '#bee3f8', size: 25 }
+                    { id: 'prog', label: '치매가족지원\n(프로그램)', color: '#f6ad55', size: 30 },
+                    { id: 'caregiver', label: '요양보호사', color: '#fc8181', size: 20 },
+                    { id: 'budget', label: '운영 예산', color: '#fef08a', size: 20 },
+                    { id: 'human', label: '인적자원(전문가)', color: '#9ae6b4', size: 25 },
+                    { id: 'material', label: '물적자원(예산/물품)', color: '#bee3f8', size: 25 }
                 ];
                 const e = [
-                    { from: 'pizza', to: 'tomato', label: 'hasTopping', arrows: 'to' },
-                    { from: 'pizza', to: 'cheese', label: 'hasTopping', arrows: 'to' },
-                    { from: 'tomato', to: 'veg', label: 'isA (속함)', arrows: 'to', dashes: true },
-                    { from: 'cheese', to: 'dairy', label: 'isA (속함)', arrows: 'to', dashes: true }
+                    { from: 'prog', to: 'caregiver', label: '필요로 함', arrows: 'to' },
+                    { from: 'prog', to: 'budget', label: '필요로 함', arrows: 'to' },
+                    { from: 'caregiver', to: 'human', label: 'isA (속함)', arrows: 'to', dashes: true },
+                    { from: 'budget', to: 'material', label: 'isA (속함)', arrows: 'to', dashes: true }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">🔍 검색 쿼리 실행하기</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #3182ce;">🔍 인적자원 검색 쿼리 실행</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
-                showLog(`검색 중... 마르게리타의 토핑을 찾고, 그 중 '채소류'에 속하는 데이터를 걸러냅니다...`);
+                showLog(`검색 중... 프로그램 필요 자원을 찾고, 그 중 '인적자원'에 속하는 데이터만 걸러냅니다...`);
                 
                 setTimeout(() => {
                     nodes.update({ 
-                        id: 'tomato', 
+                        id: 'caregiver', 
                         size: 40, 
                         color: { background: '#e53e3e', border: '#9b2c2c' },
                         shadow: { enabled: true, color: 'rgba(229,62,62,0.8)', size: 15 }
                     });
-                    showLog(`🎯 <strong>검색 완료!</strong> 그래프를 탐색하여 <strong>'토마토'</strong>를 찾아냈습니다! 이것이 온톨로지(SPARQL) 검색의 힘입니다.`);
+                    showLog(`🎯 <strong>검색 완료!</strong> 그래프를 탐색하여 <strong>'요양보호사'</strong>를 찾아냈습니다! 이것이 온톨로지(SPARQL) 검색의 힘입니다.`);
                     btn.innerText = "검색 완료!";
                 }, 1500);
             }
         },
         {
-            title: "에필로그: 온톨로지 마스터를 향하여",
+            title: "에필로그: 사회복지 온톨로지 마스터를 향하여",
             desc: `
                 <p>튜토리얼을 모두 마친 것을 축하합니다! 🎉</p>
                 <p>이제 여러분은 <strong>프로테제(Protégé)</strong>라는 전문 도구를 다룰 준비가 되었습니다.</p>
@@ -587,39 +578,38 @@
                     <strong>Protégé (프로테제)란?</strong><br>
                     스탠포드 대학교에서 만든 무료 온톨로지 에디터입니다. 마우스 클릭만으로 복잡한 지식 구조를 구축할 수 있습니다.
                 </div>
-                <p>전 세계 표준 입문 코스인 '피자 온톨로지' 만들기에 도전해 보세요! 바로 다운로드하고 실습할 수 있습니다.</p>
+                <p>나만의 사회복지 대상자 관리, 자원망 온톨로지를 구축하는 여정에 도전해 보세요!</p>
                 <ul style="margin: 10px 0 15px -15px;">
-                    <li>🔗 <a href="https://protege.stanford.edu/" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">Protégé 공식 다운로드</a></li>
-                    <li>🔗 <a href="https://protegewiki.stanford.edu/wiki/Protege4Pizzas10Minutes" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">피자 온톨로지 10분 튜토리얼 (영문 가이드)</a></li>
-                    <li style="margin-top: 5px;">📺 <a href="https://www.youtube.com/@jayjoykim/videos" target="_blank" style="color: #e53e3e; font-weight: bold; text-decoration: underline;">한국어 추천 영상 강의 (Justin Kim 님 유튜브)</a> - 영어가 부담스럽다면 이곳에서 한글 강의를 시청해 보세요!</li>
+                    <li>🔗 <a href="https://protege.stanford.edu/" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">Protégé 공식 홈페이지 다운로드</a></li>
+                    <li>🔗 <a href="https://protegewiki.stanford.edu/wiki/Protege4Pizzas10Minutes" target="_blank" style="color: #3182ce; font-weight: bold; text-decoration: underline;">초보자를 위한 공식 피자 튜토리얼 (영문)</a></li>
+                    <li style="margin-top: 5px;">📺 <a href="https://www.youtube.com/@jayjoykim/videos" target="_blank" style="color: #e53e3e; font-weight: bold; text-decoration: underline;">Justin Kim 님 한국어 영상 강의 (추천)</a> - 영어가 부담스럽다면 이곳에서 기본기를 익혀보세요!</li>
                 </ul>
             `,
             initData: () => {
                 const n = [
-                    { id: 'pizza', label: '피자 (Pizza)', color: '#f6ad55', size: 35, shape: 'star' },
-                    { id: 'tomato', label: '토마토', color: '#fc8181' },
-                    { id: 'cheese', label: '치즈', color: '#fef08a' },
-                    { id: 'mushroom', label: '버섯', color: '#d6bcfa' }
+                    { id: 'welfare', label: '사회복지\n온톨로지', color: '#f6ad55', size: 35, shape: 'star' },
+                    { id: 'client', label: '복지대상자', color: '#fc8181' },
+                    { id: 'service', label: '복지서비스', color: '#fef08a' },
+                    { id: 'worker', label: '사회복지사', color: '#d6bcfa' }
                 ];
                 const e = [
-                    { from: 'pizza', to: 'tomato', label: '토핑으로 가짐', arrows: 'to', dashes: true },
-                    { from: 'pizza', to: 'cheese', label: '토핑으로 가짐', arrows: 'to', dashes: true },
-                    { from: 'pizza', to: 'mushroom', label: '토핑으로 가짐', arrows: 'to', dashes: true }
+                    { from: 'welfare', to: 'client', label: '포함함', arrows: 'to', dashes: true },
+                    { from: 'welfare', to: 'service', label: '포함함', arrows: 'to', dashes: true },
+                    { from: 'welfare', to: 'worker', label: '포함함', arrows: 'to', dashes: true }
                 ];
                 return { n, e };
             },
-            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #dd6b20;">🍕 프로테제 피자 튜토리얼 힌트 보기</button>`,
+            actionHtml: `<button id="action-btn" class="action-btn" style="background-color: #dd6b20;">🎓 사회복지 온톨로지 설계 팁 보기</button>`,
             onAction: (btn) => {
                 btn.disabled = true;
                 btn.innerText = "준비 완료!";
-                showLog(`💡 힌트: 공식 가이드를 따라 'Margarita Pizza' 클래스를 만들고 추론기를 돌려보세요! 앞으로의 여정을 응원합니다 🚀`);
+                showLog(`💡 힌트: '대상자', '서비스', '기관' 이라는 큰 뼈대(클래스)를 먼저 세우고 세부 항목을 추가해 보세요. 앞으로의 사회복지 혁신을 응원합니다! 🚀`);
                 
-                // 피자 노드 통통 튀는 효과
                 let scale = 1.0;
                 let grow = true;
                 const interval = setInterval(() => {
                     scale = grow ? 1.4 : 1.0;
-                    nodes.update({ id: 'pizza', size: 35 * scale });
+                    nodes.update({ id: 'welfare', size: 35 * scale });
                     grow = !grow;
                 }, 400);
                 setTimeout(() => clearInterval(interval), 2000);
